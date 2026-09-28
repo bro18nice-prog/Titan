@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#060a18">
+    <meta name="description" content="Control privat pentru TITAN Hub.">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/assets/icons/titan-gothic-cyan.png">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>TITAN</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div class="brand-row">
+          <div class="brand-mark" aria-hidden="true">T</div>
+          <div>
+            <p class="eyebrow">PRIVATE COMMAND CENTER</p>
+            <h1>TITAN</h1>
+          </div>
+          <span class="connection" id="connection-status"><i></i> Local</span>
+        </div>
+        <p class="subtitle">Controlul casei și al laptopului, într-un singur loc.</p>
+      </header>
+
+      <section class="system-card" aria-label="Stare sistem">
+        <div>
+          <span class="section-label">TITAN HUB</span>
+          <strong id="hub-status">Se conectează…</strong>
+        </div>
+        <span class="shield">◈ PRIVAT</span>
+      </section>
+
+      <section class="pairing-card" id="pairing-card" hidden aria-labelledby="pairing-title">
+        <div>
+          <span class="section-label">PRIMA CONECTARE</span>
+          <h2 id="pairing-title">Conectează acest telefon</h2>
+          <p>Introdu codul generat pe laptop. Va fi salvat doar pe acest telefon.</p>
+        </div>
+        <div class="pairing-form">
+          <label class="sr-only" for="pairing-token">Cod TITAN</label>
+          <input id="pairing-token" autocomplete="current-password" placeholder="Cod TITAN">
+          <button id="pair-button" type="button">Conectează</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="quick-title">
+        <div class="section-heading">
+          <h2 id="quick-title">Comenzi rapide</h2>
+          <span>acasă</span>
+        </div>
+        <div class="quick-grid">
+          <button data-command="aprinde becul in bucatarie"><span>✦</span>Bucătărie<br><b>Aprinde</b></button>
+          <button data-command="stinge becul in bucatarie"><span>◌</span>Bucătărie<br><b>Stinge</b></button>
+          <button data-command="aprinde becul pe hol"><span>✦</span>Hol<br><b>Aprinde</b></button>
+          <button class="accent" data-command="porneste laptopul"><span>⌁</span>Laptop<br><b>Pornește</b></button>
+        </div>
+      </section>
+
+      <section class="chat" aria-label="Conversație cu TITAN">
+        <div class="section-heading">
+          <h2>Comandă TITAN</h2>
+          <button class="clear-button" id="clear-chat" type="button">Șterge</button>
+        </div>
+        <div class="messages" id="messages" aria-live="polite">
+          <article class="message titan-message">Salut. Scrie o comandă, de exemplu „aprinde becul în bucătărie”.</article>
+        </div>
+        <form id="command-form" class="command-form">
+          <label class="sr-only" for="command-input">Comanda ta</label>
+          <input id="command-input" name="command" autocomplete="off" maxlength="500" placeholder="Scrie o comandă…" required>
+          <button id="send-button" type="submit" aria-label="Trimite comanda">➜</button>
+        </form>
+      </section>
+
+      <footer>
+        <span>TEXT MODE</span>
+        <span>VOICE MODE · CURÂND</span>
+      </footer>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

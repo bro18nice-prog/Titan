@@ -1,0 +1,19 @@
+{
+  "provider": "tuya_local",
+  "entities": {
+    "bucatarie": {
+      "device_id": "ID_UL_BECULUI",
+      "ip": "ADRESA_IP_LOCALA",
+      "local_key": "CHEIA_LOCALA_A_BECULUI",
+      "version": 3.3,
+      "power_dps": "20"
+    },
+    "hol": {
+      "device_id": "ID_UL_BECULUI",
+      "ip": "ADRESA_IP_LOCALA",
+      "local_key": "CHEIA_LOCALA_A_BECULUI",
+      "version": 3.3,
+      "power_dps": "20"
+    }
+  }
+}

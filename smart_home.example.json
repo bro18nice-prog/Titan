@@ -1,0 +1,13 @@
+{
+  "provider": "home_assistant",
+  "url": "http://homeassistant.local:8123",
+  "token": "LIPSESTE_TOKENUL_TAU_LOCAL",
+  "entities": {
+    "all": "light.toate_luminile",
+    "bucatarie": "light.bec_bucatarie",
+    "hol": "light.bec_hol",
+    "dormitor": "light.led_dormitor",
+    "birou": "light.led_birou",
+    "living": "light.led_living"
+  }
+}

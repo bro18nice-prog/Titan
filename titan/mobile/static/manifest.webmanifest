@@ -1,0 +1,17 @@
+{
+  "name": "TITAN Command Center",
+  "short_name": "TITAN",
+  "description": "Control privat pentru TITAN Hub.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060a18",
+  "theme_color": "#060a18",
+  "icons": [
+    {
+      "src": "/assets/icons/titan-gothic-cyan.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
