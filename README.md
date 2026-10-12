@@ -147,6 +147,25 @@ doar pe laptop. Când mutăm proiectul pe Pi, îl vom păstra pe `127.0.0.1`, vo
 seta `TITAN_MOBILE_ACCESS_TOKEN` în `.env` şi îl vom expune privat prin
 Tailscale Serve — fără port forwarding sau acces public la rețeaua casei.
 
+## Casa: prize, becuri și consum pe Raspberry Pi
+
+Aplicația de telefon are secțiunea **Casa**: pornești/oprești prize și becuri,
+reglezi luminozitatea și vezi consumul (W acum, kWh pe zi/săptămână/lună,
+grafic și pe prize). Măsurătorile se salvează local în `data/energy.db`.
+
+Instalare pe Pi (Raspberry Pi OS):
+
+```bash
+git clone https://github.com/bro18nice-prog/Titan.git && cd Titan
+bash deploy/install-pi.sh
+```
+
+Scriptul creează mediul Python, `.env` cu un cod de acces generat, serviciul
+`titan-mobile` (pornește la boot) și publică aplicația privat prin Tailscale
+Serve. Completează apoi `smart_home.json` (vezi `smart_home.plugs.example.json`):
+becurile ca până acum, prizele cu `"type": "plug"`. Pentru cost, setează
+`TITAN_KWH_PRICE` în `.env`.
+
 ## Instalare
 
 Ai nevoie de Python 3.11 sau mai nou. Deschide PowerShell în acest folder și rulează:

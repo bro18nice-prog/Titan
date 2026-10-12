@@ -36,3 +36,6 @@ dist/
 snapshot.json
 home-assistant-vm/
 .vbox-runtime/
+
+# Măsurători de consum, locale
+data/
