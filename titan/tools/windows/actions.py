@@ -6,10 +6,7 @@ adăugăm Raspberry Pi, acesta va primi un modul echivalent, separat.
 
 from __future__ import annotations
 
-try:
-    from ctypes import windll
-except ImportError:  # Linux/Raspberry Pi: acțiunile Windows nu sunt disponibile
-    windll = None
+from ctypes import windll
 from pathlib import Path
 from datetime import datetime
 import os
