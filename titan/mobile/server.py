@@ -8,6 +8,7 @@ Tailscale Serve, nu prin port-forwarding.
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 import os
 from pathlib import Path
@@ -15,13 +16,15 @@ import re
 import secrets
 from threading import Lock
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, status
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 from titan.core.assistant import TitanAssistant
+from titan.tools.energy import EnergySampler, EnergyStore, summarize
+from titan.tools.home_devices import HomeDevices, HomeError
 
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -36,6 +39,14 @@ class CommandRequest(BaseModel):
 
     text: str = Field(min_length=1, max_length=500)
     session_id: str | None = Field(default=None, max_length=80)
+
+
+class PowerRequest(BaseModel):
+    on: bool
+
+
+class BrightnessRequest(BaseModel):
+    percent: int = Field(ge=1, le=100)
 
 
 class CommandResponse(BaseModel):
@@ -105,6 +116,9 @@ def create_app(
     *,
     assistant_factory: Callable[[], TitanAssistant] = TitanAssistant,
     access_token: str | None = None,
+    home: HomeDevices | None = None,
+    energy: EnergyStore | None = None,
+    run_sampler: bool = False,
 ) -> FastAPI:
     """Creează aplicația fără a o publica în rețea.
 
@@ -114,7 +128,19 @@ def create_app(
 
     token = access_token if access_token is not None else os.getenv("TITAN_MOBILE_ACCESS_TOKEN", "")
     sessions = AssistantSessions(assistant_factory)
-    app = FastAPI(title="TITAN Mobile", docs_url=None, redoc_url=None)
+    home = home or HomeDevices(PROJECT_ROOT / "smart_home.json")
+    store = energy or EnergyStore(PROJECT_ROOT / "data" / "energy.db")
+    sampler = EnergySampler(home.read_watts, store) if run_sampler else None
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        if sampler and home.meters():
+            sampler.start()
+        yield
+        if sampler:
+            sampler.stop()
+
+    app = FastAPI(title="TITAN Mobile", docs_url=None, redoc_url=None, lifespan=lifespan)
     authenticate = _require_token(token)
 
     @app.get("/", include_in_schema=False)
@@ -139,6 +165,41 @@ def create_app(
         response = assistant.handle(command.text.strip())
         return CommandResponse(response=response, session_id=session_id)
 
+    @app.get("/api/home/devices", dependencies=[Depends(authenticate)])
+    def home_devices() -> dict:
+        return {"configured": home.configured(), "devices": home.snapshot()}
+
+    @app.post("/api/home/devices/{device_id}/power", dependencies=[Depends(authenticate)])
+    def home_power(device_id: str, request: PowerRequest) -> dict:
+        try:
+            return home.set_power(device_id, request.on)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Dispozitiv necunoscut.") from None
+        except HomeError as error:
+            raise HTTPException(status_code=502, detail=str(error)) from error
+
+    @app.post("/api/home/devices/{device_id}/brightness", dependencies=[Depends(authenticate)])
+    def home_brightness(device_id: str, request: BrightnessRequest) -> dict[str, bool]:
+        try:
+            home.set_brightness(device_id, request.percent)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Dispozitiv necunoscut.") from None
+        except HomeError as error:
+            raise HTTPException(status_code=502, detail=str(error)) from error
+        return {"ok": True}
+
+    @app.get("/api/home/energy", dependencies=[Depends(authenticate)])
+    def home_energy(range: str = Query("day", pattern="^(day|week|month)$")) -> dict:
+        data = summarize(store, home.meters(), range)
+        price = os.getenv("TITAN_KWH_PRICE", "").replace(",", ".")
+        try:
+            data["price_per_kwh"] = float(price) if price else None
+        except ValueError:
+            data["price_per_kwh"] = None
+        data["currency"] = os.getenv("TITAN_CURRENCY", "lei")
+        data["metered_devices"] = len(home.meters())
+        return data
+
     # Imaginile aplicației sunt reutilizate din identitatea deja aleasă pentru
     # TITAN, fără duplicări inutile în proiect.
     app.mount("/assets", StaticFiles(directory=PROJECT_ROOT / "assets"), name="assets")
@@ -146,7 +207,7 @@ def create_app(
     return app
 
 
-app = create_app()
+app = create_app(run_sampler=True)
 
 
 def main() -> None:

@@ -77,3 +77,27 @@ h2 { margin: 0; font-size: 15px; letter-spacing: -.025em; }
 footer { display: flex; justify-content: space-between; padding: 22px 2px 0; color: #65728c; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (min-width: 560px) { .app-shell { padding-top: 46px; } .quick-grid { grid-template-columns: repeat(4, 1fr); } .quick-grid button { min-height: 108px; } }
+
+/* Casa: dispozitive și consum */
+.home[hidden], .energy-card[hidden] { display: none; }
+.energy-card { margin-bottom: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface-strong); }
+.energy-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.energy-now { display: block; margin-top: 6px; font-size: 34px; letter-spacing: -.04em; }
+.energy-total { text-align: right; }
+.energy-total strong { display: block; margin-top: 6px; font-size: 20px; }
+.energy-total small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+#energy-chart { width: 100%; height: 110px; margin-top: 14px; display: block; }
+.range-tabs { display: flex; gap: 6px; margin-top: 10px; }
+.range-tabs button { flex: 1; padding: 8px 4px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; }
+.range-tabs button.active { color: var(--ink); border-color: rgba(77,229,255,.58); background: var(--cyan-soft); }
+.energy-list { list-style: none; margin: 12px 0 0; padding: 0; font-size: 14px; }
+.energy-list li { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--line); color: var(--muted); }
+.energy-list b { color: var(--ink); font-weight: 600; }
+.device-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.device { padding: 14px; text-align: left; border: 1px solid var(--line); border-radius: 18px; background: var(--surface-strong); color: var(--ink); min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
+.device.on { border-color: rgba(77,229,255,.58); background: linear-gradient(160deg, rgba(77,229,255,.16), var(--surface-strong)); }
+.device.offline { opacity: .5; }
+.device .d-name { font-weight: 700; }
+.device .d-state { font-size: 13px; color: var(--muted); }
+.device.on .d-state { color: var(--cyan); }
+.device input[type=range] { width: 100%; accent-color: var(--cyan); }

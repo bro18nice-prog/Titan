@@ -1,0 +1,35 @@
+name: tests
+on:
+  push:
+    branches: [main, "feature/**", "fix/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: install (light, without audio/voice packages)
+        run: pip install fastapi httpx "pydantic" python-dotenv tinytuya
+      - name: tests
+        id: tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python -m unittest tests.test_home_energy tests.test_mobile_server tests.test_smart_home -v 2>&1 | tee tests.txt
+      - name: all tests (full suite, best effort)
+        continue-on-error: true
+        run: python -m unittest discover -s tests 2>&1 | tail -20 | tee full.txt
+      - name: publish results
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="build-${{ github.run_number }}"
+          out=$(gh release create "$tag" tests.txt full.txt --prerelease --target "${{ github.sha }}" --title "Build ${{ github.run_number }} (${{ github.ref_name }})" --notes "tests: ${{ steps.tests.outcome }}" 2>&1) || { echo "::error::$(echo "$out" | tr '\n' ' ')"; exit 1; }
+      - name: fail if tests failed
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
